@@ -1,0 +1,30 @@
+#pragma kernel CSMain
+
+#include "boidBase.cginc"
+
+RWTexture2D<float3> Render;
+
+float searchInfluence;
+float searchDistance;
+float speed;
+
+[numthreads(1023,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    int index = int(id.x);
+    if(index < boidCount){
+        Boid boid = boids[index];
+        float2 forward = normalize(boid.velocity);
+        float2 right = float2(-forward.y, forward.x);
+        float2 dirSum = float2(0,0);
+        for(int i = -1; i <= 1; i++){
+            float2 dir = normalize(forward+right*i);
+            dirSum += Render[boid.pos+dir*searchDistance].r*dir;
+        }
+        float2 newDir = forward;
+        if(length(dirSum) > 0)
+            newDir += normalize(dirSum)*searchInfluence;
+        boid.velocity = normalize(newDir)*speed;
+        boids[index] = boid;
+    }
+}

@@ -1,0 +1,21 @@
+#pragma kernel CSMain
+
+
+RWTexture2D<float3> Render;
+
+float dt;
+float blurFallOff;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    uint2 pixel = id.xy;
+    float3 sum = float3(0,0,0);
+    for(int x = -1; x <= 1; x++){
+        for(int y = -1; y <= 1; y++){
+            sum += Render[pixel+int2(x,y)];
+        }
+    }
+    sum /= 9.0f;
+    Render[pixel] = sum*(1-dt*blurFallOff);
+}

@@ -1,0 +1,15 @@
+#pragma kernel CSMain
+
+RWTexture2D<float3> Render;
+
+#include "boidBase.cginc"
+
+[numthreads(1023,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    int index = int(id.x);
+    if(index < boidCount){
+        Boid boid = boids[index];
+        Render[boid.pos] = float3(1,1,1);
+    }
+}

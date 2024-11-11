@@ -1,0 +1,19 @@
+#pragma kernel CSMain
+
+#include "boidBase.cginc"
+
+float dt;
+
+[numthreads(1023,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    int index = int(id.x);
+    if(index < boidCount){
+        Boid boid = boids[index];
+        boid.pos = boid.pos+boid.velocity*dt;
+        boid.pos.x = (boid.pos.x+1920)%1920;
+        boid.pos.y = (boid.pos.y+1080)%1080;
+        boids[index] = boid;
+    }
+    
+}
