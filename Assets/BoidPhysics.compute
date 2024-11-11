@@ -9,11 +9,13 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 {
     int index = int(id.x);
     if(index < boidCount){
-        Boid boid = boids[index];
-        boid.pos = boid.pos+boid.velocity*dt;
-        boid.pos.x = (boid.pos.x+1920)%1920;
-        boid.pos.y = (boid.pos.y+1080)%1080;
-        boids[index] = boid;
+        Boid boid = boids[index]; //this gets the boid data into the thread groups private cache
+        //you want to do this as rearly as possible, because it is slow, however when the data is in the thread groups cache,
+        //you can use it extremley fast.
+        boid.pos = boid.pos+boid.velocity*dt; //applies the velocity
+        boid.pos.x = (boid.pos.x+1920)%1920; //this makes the boid apear on the other side when exiting the bounds
+        boid.pos.y = (boid.pos.y+1080)%1080; //this makes the boid apear on the other side when exiting the bounds
+        boids[index] = boid; //updates the new boid data back to the buffer.
     }
     
 }

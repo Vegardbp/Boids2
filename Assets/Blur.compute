@@ -9,7 +9,9 @@ float blurFallOff;
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    uint2 pixel = id.xy;
+    uint2 pixel = id.xy; //get the pixel position that should be blured
+
+    //calculate the average value of the 3x3 surrounding pixels
     float3 sum = float3(0,0,0);
     for(int x = -1; x <= 1; x++){
         for(int y = -1; y <= 1; y++){
@@ -17,5 +19,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         }
     }
     sum /= 9.0f;
-    Render[pixel] = sum*(1-dt*blurFallOff);
+
+    Render[pixel] = sum*(1-dt*blurFallOff); //set the pixel to that value, but slightly weaker proportional to the blur falloff, so it decays over time
+    //this also means that bluring with a big blur fallOff, is practically the same as clearing the texture.
 }

@@ -1,15 +1,33 @@
+//this is just to define the kernel, you dont have to care about this
 #pragma kernel CSMain
 
-RWTexture2D<float3> Render;
+RWTexture2D<float3> Render; //the texture that will be rendered to. is set to RW so it can be read to and written from
 
+//include boidBase, so it has access to the boid buffer and boidCount if SetBoidBuffer is ran on the cpu for this compute shader
 #include "boidBase.cginc"
 
-[numthreads(1023,1,1)]
+[numthreads(1023,1,1)] //this is the thread group size, you can think of it like this:
+//for(x = 0; x < 1023; x++){
+    //for(y = 0; y < 1; y++){
+        //for(z = 0; z < 1; z++){
+            //Contents of CSMain
+        //}
+    //}
+//}
+//and this nested for loop is run every time you run compute.Distpatch(0,1,1,1), 
+//where 1,1,1 in the dispatch function is its own nested for loop, in the same way the thread group is, 
+//but you usually dont have to think about the fact that there are technically multiple thread groups.
+//also, x*y*z in numthreads should never excede 1023
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    int index = int(id.x);
-    if(index < boidCount){
-        Boid boid = boids[index];
-        Render[boid.pos] = float3(1,1,1);
+    //this is the code that runs in the "nested for loop", except that it all happens at the same time for a thread group
+    //however there is no guarantee that every thread group will run at the same time.
+    //Therefore, if you for example run value[3]++ in this for 3 threads, you have no way to know if value[3] will be 1,2,or 3
+    //because they might happen at the same time and ovewrite eachother, or at different times and work as expected
+    int index = int(id.x); //the value called id, tells you which thread you are in, you can think of this like the x,y, and z values
+    if(index < boidCount){ //only runs if there actually is a boid cooresponding to the thread, because if not, its just a waste of time
+        Boid boid = boids[index]; //get the boid data
+        Render[boid.pos] = float3(1,1,1); //find the pixel in the texture that is closest to the position, and set it to white
+        //this is an unconventional way of rendering, but its a lot faster and works perfectly, for specifically this task.
     }
 }
