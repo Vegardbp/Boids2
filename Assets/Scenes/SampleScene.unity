@@ -247,7 +247,7 @@ MonoBehaviour:
   imageTarget: {fileID: 358124737}
   run: 1
   setUp: 0
-  boidCount: 7000001
+  boidCount: 7000000
   blurFallOff: 0.5
   searchDistance: 50
   searchInfluence: 10
