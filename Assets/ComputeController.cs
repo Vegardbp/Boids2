@@ -49,10 +49,20 @@ public class ComputeController : MonoBehaviour
     //loops every frame
     void Update()
     {
-        if (setUp)
+        if (setUp || Input.GetButtonDown("Reset"))
             SetUp(); //set up if specified
         if (run)
             Run(); //run the code
+        if (Input.GetButtonDown("Randomize"))
+            Randomize();
+    }
+
+    void Randomize()
+    {
+        searchDistance = Random.Range(25, 300);
+        searchInfluence = Random.Range(0.5f, 15.0f);
+        speed = Random.Range(200, 500);
+        blurFallOff = Random.Range(0.25f, 10.0f);
     }
 
     void Run()
@@ -130,7 +140,7 @@ public class ComputeController : MonoBehaviour
             dir.Normalize();
             Vector2 pos = dir * Random.Range(1, 500);
             Vector2 orthDir = new Vector2(dir.y, -dir.x);
-            Vector2 velocity = orthDir * pos.magnitude*0.2f;
+            Vector2 velocity = new Vector2(Random.Range(-100.0f, 100.0f), Random.Range(-100.0f, 100.0f)).normalized;
             pos += new Vector2(1920 / 2, 1080 / 2);
             boidList.Add(new Boid(pos, velocity));
         }

@@ -8,6 +8,12 @@ float searchInfluence;
 float searchDistance;
 float speed;
 
+bool inBounds(float2 pos){
+    if(abs(pos.x-1920/2) > 1920/2 || abs(pos.y-1080/2) > 1080/2)
+        return false;
+    return true;
+}
+
 [numthreads(1023,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
@@ -20,6 +26,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         for(int i = -1; i <= 1; i++){
             float2 dir = normalize(forward+right*i); //this calculates the direction we'll sample from
             float2 samplePos = boid.pos+dir*searchDistance; //this is the point we'll sample from
+            float2 boundSamplePos = boid.pos+dir*50;
+            if(!inBounds(boundSamplePos))
+                dirSum -= dir*searchInfluence*4;
             dirSum += Render[samplePos].r*dir; //this adds the weight and direction of the point with the sum.
             //this essentially figures out which direction in front of it has the most white color,
             //aka, where another boid was most recently. This gives it a bias to only go where others have gone before
