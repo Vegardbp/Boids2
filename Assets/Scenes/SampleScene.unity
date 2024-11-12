@@ -245,12 +245,12 @@ MonoBehaviour:
   brainCompute: {fileID: 7200000, guid: 6b02410c09c9f154e80aedd7ea9d66ed, type: 3}
   texture: {fileID: 0}
   imageTarget: {fileID: 358124737}
-  run: 1
+  run: 0
   setUp: 0
   boidCount: 1000000
   blurFallOff: 1
-  searchDistance: 35
-  searchInfluence: 1
+  searchDistance: 300
+  searchInfluence: 0.5
   speed: 500
   targetFramerate: 500
 --- !u!114 &358124737
