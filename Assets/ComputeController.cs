@@ -57,12 +57,15 @@ public class ComputeController : MonoBehaviour
 
     void Run()
     {
-        Application.targetFrameRate = (int)targetFramerate;
-        RunPhysics(); //first applies velocity to every boids position
-        Render(); //renders the result
-        Blur(); //blurs the new result. the texture never gets cleared,
-                //so old pixels will get blurred again, making them decay over time
-        RunBrain(); //run the boid behavior, this can be reprogramed for different boid behaviours, like gravity, or collision
+        Application.targetFrameRate = (int)targetFramerate/6;
+        for(int i = 0; i < 6; i++)
+        {
+            RunPhysics(); //first applies velocity to every boids position
+            Render(); //renders the result
+            Blur(); //blurs the new result. the texture never gets cleared,
+                    //so old pixels will get blurred again, making them decay over time
+            RunBrain(); //run the boid behavior, this can be reprogramed for different boid behaviours, like gravity, or collision
+        }
     }
 
     void RunBrain()
@@ -123,8 +126,12 @@ public class ComputeController : MonoBehaviour
         List<Boid> boidList = new List<Boid>(); //create a list of boids to fill the buffer with
         for(int i = 0; i < boidCount; i++) //fill the list
         {
-            Vector2 pos = new Vector2(1920/2, 1080/2);
-            Vector2 velocity = new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(-1.0f, 1.0f));
+            Vector2 dir = new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(-1.0f, 1.0f));
+            dir.Normalize();
+            Vector2 pos = dir * Random.Range(1, 500);
+            Vector2 orthDir = new Vector2(dir.y, -dir.x);
+            Vector2 velocity = orthDir * pos.magnitude*0.2f;
+            pos += new Vector2(1920 / 2, 1080 / 2);
             boidList.Add(new Boid(pos, velocity));
         }
         boidBuffer.SetData(boidList.ToArray()); //put the list into the buffer. This isnt neccesary, as it can be done in the compute shader instead, but I'm lazy
