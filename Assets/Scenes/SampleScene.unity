@@ -247,12 +247,12 @@ MonoBehaviour:
   imageTarget: {fileID: 358124737}
   run: 1
   setUp: 0
-  boidCount: 7000000
-  blurFallOff: 0.5
-  searchDistance: 50
-  searchInfluence: 10
+  boidCount: 1000000
+  blurFallOff: 1
+  searchDistance: 35
+  searchInfluence: 1
   speed: 500
-  targetFramerate: 120
+  targetFramerate: 500
 --- !u!114 &358124737
 MonoBehaviour:
   m_ObjectHideFlags: 0
