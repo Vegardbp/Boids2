@@ -26,7 +26,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         }
         float2 newDir = forward; //starts with the new dir as forward, so if there is no white at all, it will just keep going
         if(length(dirSum) > 0) //checks if there actually was any white, because normalize(0,0) is a divition by zero, and practically deletes the boid
-            newDir += normalize(dirSum)*searchInfluence; //apply the direction with the most white, but scaled by search influence, 
+            newDir += dirSum/3.0*searchInfluence; //apply the direction with the most white, but scaled by search influence, 
             //so you can controll how fast it turns
         boid.velocity = normalize(newDir)*speed; //set the velocity to the new direction
         boids[index] = boid; //update the boid data in the buffer
