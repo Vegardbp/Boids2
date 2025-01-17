@@ -12,6 +12,7 @@ public class ComputeController : MonoBehaviour
     public ComputeShader physicsCompute; //compute shader that updates every boids position based on velocity
     public ComputeShader brainCompute; //compute shader that runs boid behavior on every boid
     public RenderTexture texture = null; //rendered reult, this doesn't need to be public, but can be nice for debugging
+    public Texture2D blockTexture;
     //the data in this texture will only ever exist on the gpu, so compute shaders are used to update it
     public RawImage imageTarget; //the raw image that will display the result
 
@@ -86,6 +87,7 @@ public class ComputeController : MonoBehaviour
         brainCompute.SetFloat("speed", speed);
         brainCompute.SetFloat("searchDistance", searchDistance);
         brainCompute.SetFloat("searchInfluence", searchInfluence);
+        brainCompute.SetFloat("seed", Random.Range(1.00f, 10.00f));
         int threadGroupCount = boidCount / 1023 + 1; //calculate how many thread groups are needed
         //since the compute shaders thread group size is 1023x1x1, it needs at least 1x1x1 thread groups to run 1023 boids,
         //or at least 10x1x1 thread groups to run 10230 boids
@@ -138,10 +140,8 @@ public class ComputeController : MonoBehaviour
         {
             Vector2 dir = new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(-1.0f, 1.0f));
             dir.Normalize();
-            Vector2 pos = dir * Random.Range(1, 500);
-            Vector2 orthDir = new Vector2(dir.y, -dir.x);
-            Vector2 velocity = new Vector2(Random.Range(-100.0f, 100.0f), Random.Range(-100.0f, 100.0f)).normalized;
-            pos += new Vector2(1920 / 2, 1080 / 2);
+            Vector2 velocity = dir;
+            Vector2 pos = new Vector2(Random.Range(0, 1920), Random.Range(0,1080));
             boidList.Add(new Boid(pos, velocity));
         }
         boidBuffer.SetData(boidList.ToArray()); //put the list into the buffer. This isnt neccesary, as it can be done in the compute shader instead, but I'm lazy
@@ -157,6 +157,7 @@ public class ComputeController : MonoBehaviour
     {
         shader.SetBuffer(0, "boids", boidBuffer); //set the buffer "boids" to boidBuffer
         shader.SetInt("boidCount", boidCount); //tell the gpu how many boids there are
+        shader.SetTexture(0, "blockTexture", blockTexture);
         //this works for any compute shader that has #include boidBase.cginc
     }
 

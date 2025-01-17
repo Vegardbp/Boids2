@@ -6,4 +6,5 @@ struct Boid{ //define the struct, it is important that all of this is exactly th
 
 RWStructuredBuffer<Boid> boids; //a Structured buffer with all the boids, this is the same as a ComputeBuffer on the cpu
 //the RW written in front is so it can be written to as well as read from, on the gpu.
+Texture2D<float3> blockTexture;
 int boidCount;

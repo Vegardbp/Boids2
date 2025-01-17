@@ -1,6 +1,7 @@
 #pragma kernel CSMain
 
 #include "boidBase.cginc"
+#include "hash.cginc"
 
 RWTexture2D<float3> Render;
 
@@ -8,8 +9,12 @@ float searchInfluence;
 float searchDistance;
 float speed;
 
+float seed;
+
 bool inBounds(float2 pos){
     if(abs(pos.x-1920/2) > 1920/2 || abs(pos.y-1080/2) > 1080/2)
+        return false;
+    if(blockTexture[int2(pos)].r != 0)
         return false;
     return true;
 }
@@ -20,23 +25,36 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     int index = int(id.x);
     if(index < boidCount){
         Boid boid = boids[index]; //gets the boid data
+        boid.pos += randomVector(id.x*seed)*0.1;
         float2 forward = normalize(boid.velocity); //figure out what way is forward
         float2 right = float2(-forward.y, forward.x); //and rightward
         float2 dirSum = float2(0,0); //this is just so we can sum the values of each point and direction
+        int boundSum = 0;
         for(int i = -1; i <= 1; i++){
             float2 dir = normalize(forward+right*i); //this calculates the direction we'll sample from
             float2 samplePos = boid.pos+dir*searchDistance; //this is the point we'll sample from
             float2 boundSamplePos = boid.pos+dir*50;
-            if(!inBounds(boundSamplePos))
+            if(!inBounds(boundSamplePos)){
                 dirSum -= dir*searchInfluence*4;
+                boundSum++;
+            }
+                
             dirSum += Render[samplePos].r*dir; //this adds the weight and direction of the point with the sum.
             //this essentially figures out which direction in front of it has the most white color,
             //aka, where another boid was most recently. This gives it a bias to only go where others have gone before
         }
         float2 newDir = forward; //starts with the new dir as forward, so if there is no white at all, it will just keep going
-        if(length(dirSum) > 0) //checks if there actually was any white, because normalize(0,0) is a divition by zero, and practically deletes the boid
+        if(length(dirSum) > 0 && boundSum < 3){ //checks if there actually was any white, because normalize(0,0) is a divition by zero, and practically deletes the boid
             newDir += dirSum/3.0*searchInfluence; //apply the direction with the most white, but scaled by search influence, 
             //so you can controll how fast it turns
+        }
+
+        float xTestPos = hash(id.x,seed)*1920;
+        float yTestPos = hash(id.x+boidCount,seed)*1080;
+        float2 testPos = float2(xTestPos,yTestPos);
+        if(inBounds(testPos))
+            newDir = normalize(testPos-boid.pos)*searchInfluence;
+
         boid.velocity = normalize(newDir)*speed; //set the velocity to the new direction
         boids[index] = boid; //update the boid data in the buffer
     }

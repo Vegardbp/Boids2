@@ -244,14 +244,15 @@ MonoBehaviour:
   physicsCompute: {fileID: 7200000, guid: d2bc50f9c0a2316438cb946e33374852, type: 3}
   brainCompute: {fileID: 7200000, guid: 6b02410c09c9f154e80aedd7ea9d66ed, type: 3}
   texture: {fileID: 0}
+  blockTexture: {fileID: 2800000, guid: fb634c1b1306f5143a659ad134e69444, type: 3}
   imageTarget: {fileID: 358124737}
   run: 1
   setUp: 0
   boidCount: 1000000
-  blurFallOff: 2
-  searchDistance: 50
-  searchInfluence: 1000
-  speed: 600
+  blurFallOff: 1
+  searchDistance: 25
+  searchInfluence: 1
+  speed: 500
   targetFramerate: 500
 --- !u!114 &358124737
 MonoBehaviour:
